@@ -66,6 +66,11 @@ public class BacktestExecutionPlatform extends AbstractExecutionPlatform impleme
      */
     protected void resolveOrder(Order order) {
         // try to filled the order according to ohlcv item
+
+        if(getActualOhlcvItem() == null) {
+            return;
+        }
+
         ResolveOrderService.resolveOrder(getActualOhlcvItem(), null, order);
         // resolve the trading positions
         if (OrderStatus.FILLED.equals(order.getStatus())) {

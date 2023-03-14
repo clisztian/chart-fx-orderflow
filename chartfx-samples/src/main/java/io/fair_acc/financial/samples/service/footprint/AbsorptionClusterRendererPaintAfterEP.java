@@ -51,10 +51,10 @@ public class AbsorptionClusterRendererPaintAfterEP implements RendererPaintAfter
 
     protected void initByDatasetFxStyle() {
         String style = ds.getStyle();
-        absorptionAskColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_ASK_COLOR, Color.rgb(255, 128, 128));
-        absorptionBidColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_BID_COLOR, Color.GREEN);
-        absorptionAskTransColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_ASK_TRANS_COLOR, Color.rgb(255, 128, 128, 0.2));
-        absorptionBidTransColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_BID_TRANS_COLOR, Color.rgb(0, 255, 0, 0.2));
+        absorptionAskColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_ASK_COLOR, Color.rgb(186, 59, 150));
+        absorptionBidColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_BID_COLOR, Color.rgb(59, 171, 186));
+        absorptionAskTransColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_ASK_TRANS_COLOR, Color.rgb(186, 59, 150, 0.3));
+        absorptionBidTransColor = StyleParser.getColorPropertyValue(style, DATASET_ABSORPTION_BID_TRANS_COLOR, Color.rgb(59, 171, 186, 0.3));
     }
 
     @Override

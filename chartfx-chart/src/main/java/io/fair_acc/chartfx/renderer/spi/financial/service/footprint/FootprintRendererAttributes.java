@@ -74,32 +74,32 @@ public class FootprintRendererAttributes extends AttributeModel {
         case FinancialColorSchemeConstants.CLEARLOOK:
             columnColorGroupSettings = new Color[][] {
                 {
-                        Color.rgb(0, 128, 255), // RANGE 0 BID COLOR, color: light blue
-                        Color.rgb(128, 128, 128), // RANGE 1 BID COLOR, color: white
-                        Color.rgb(255, 128, 192), // RANGE 2 BID COLOR, color: pink
-                        Color.rgb(242, 0, 0) // RANGE 3 BID COLOR, color: red
+                        Color.rgb(194, 54, 92), // RANGE 0 BID COLOR, color: light blue
+                        Color.rgb(210, 88, 103), // RANGE 1 BID COLOR, color: white
+                        Color.rgb(201, 102, 127), // RANGE 2 BID COLOR, color: pink
+                        Color.rgb(255, 102, 102) // RANGE 3 BID COLOR, color: red
                 },
                 {
-                        Color.rgb(0, 128, 255), // RANGE 0 ASK COLOR, color: light blue
-                        Color.rgb(128, 128, 128), // RANGE 1 ASK COLOR, color: white
-                        Color.rgb(124, 190, 190), // RANGE 2 ASK COLOR, color: light green
-                        Color.rgb(0, 128, 0) // RANGE 3 ASK COLOR, color: green
+                        Color.rgb(152, 191, 238), // RANGE 0 ASK COLOR, color: light blue
+                        Color.rgb(125, 172, 255), // RANGE 1 ASK COLOR, color: white
+                        Color.rgb(100, 157, 255), // RANGE 2 ASK COLOR, color: light green
+                        Color.rgb(52, 125, 250) // RANGE 3 ASK COLOR, color: green
                 }
             };
             break;
         default:
             columnColorGroupSettings = new Color[][] {
                 {
-                        Color.rgb(0, 128, 255), // RANGE 0 BID COLOR, color: light blue
-                        Color.rgb(255, 255, 255), // RANGE 1 BID COLOR, color: white
-                        Color.rgb(255, 128, 192), // RANGE 2 BID COLOR, color: pink
-                        Color.rgb(242, 0, 0) // RANGE 3 BID COLOR, color: red
+                        Color.rgb(194, 54, 92), // RANGE 0 BID COLOR, color: light blue
+                        Color.rgb(210, 88, 103), // RANGE 1 BID COLOR, color: white
+                        Color.rgb(201, 102, 127), // RANGE 2 BID COLOR, color: pink
+                        Color.rgb(255, 102, 102) // RANGE 3 BID COLOR, color: red
                 },
                 {
-                        Color.rgb(0, 128, 255), // RANGE 0 ASK COLOR, color: light blue
-                        Color.rgb(255, 255, 255), // RANGE 1 ASK COLOR, color: white
-                        Color.rgb(124, 190, 190), // RANGE 2 ASK COLOR, color: light green
-                        Color.rgb(0, 128, 0) // RANGE 3 ASK COLOR, color: green
+                        Color.rgb(152, 191, 238), // RANGE 0 ASK COLOR, color: light blue
+                        Color.rgb(125, 172, 255), // RANGE 1 ASK COLOR, color: white
+                        Color.rgb(100, 157, 255), // RANGE 2 ASK COLOR, color: light green
+                        Color.rgb(52, 125, 250) // RANGE 3 ASK COLOR, color: green
                 }
             };
             break;

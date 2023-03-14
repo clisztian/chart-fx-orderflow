@@ -1,9 +1,5 @@
 package io.fair_acc.financial.samples;
 
-import static io.fair_acc.financial.samples.service.period.IntradayPeriod.IntradayPeriodEnum.M;
-import static io.fair_acc.financial.samples.service.period.IntradayPeriod.IntradayPeriodEnum.S;
-import java.util.HashMap;
-
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.renderer.spi.financial.FootprintRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.css.FinancialColorSchemeConstants;
@@ -17,6 +13,10 @@ import io.fair_acc.financial.samples.service.footprint.DiagonalDominantNbColumnC
 import io.fair_acc.financial.samples.service.footprint.FootprintRenderedAPIAdapter;
 import io.fair_acc.financial.samples.service.period.IntradayPeriod;
 
+import java.util.HashMap;
+
+import static io.fair_acc.financial.samples.service.period.IntradayPeriod.IntradayPeriodEnum.M;
+
 /**
  * Tick FOOTPRINT realtime processing. Demonstration of re-sample data to 2M timeframe.
  * Support/Resistance range levels added.
@@ -24,15 +24,15 @@ import io.fair_acc.financial.samples.service.period.IntradayPeriod;
  *
  * @author afischer
  */
-public class FinancialRealtimeFootprintSample extends FinancialRealtimeCandlestickSample {
+public class FinancialRealtimeFootprintTickData extends FinancialRealtimeOrderFlowSample {
     @Override
     protected void configureApp() {
-        title = "Replay FOOTPRINT Tick Data in real-time (press 'replay' button, zoom by mousewheel)";
+        title = "Novartis AG (NOVN) Footprint Tick Data";
         theme = FinancialColorSchemeConstants.DARK;
         resource = "REALTIME_OHLC_TICK";
-        timeRange = "2016/07/29 13:25-2016/07/29 14:25";
+        timeRange = "2022/02/09 09:02-2022/02/09 16:25";  //2022-02-09 10:34:57.022183000
         tt = "00:00-23:59"; // time template whole day session
-        replayFrom = "2016/07/29 13:58";
+        replayFrom = "2022/02/09 10:25";
         // price consolidation addons (extensions)
         consolidationAddons = new HashMap<>();
         consolidationAddons.put("footprintCalcAddons", new OhlcvConsolidationAddon[] {

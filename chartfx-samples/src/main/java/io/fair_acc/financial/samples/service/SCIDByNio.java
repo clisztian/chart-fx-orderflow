@@ -122,6 +122,7 @@ public class SCIDByNio implements AutoCloseable {
      */
     public TickOhlcvDataProvider createTickDataReplayStream(@NotNull final Interval<Calendar> requiredTimestamps,
             @NotNull final Date replayStarTime, DoubleProperty replaySpeed) throws IOException {
+
         // define boundaries of loaded data
         final long positionStart = ensureNearestTimestampPosition(requiredTimestamps.from.getTime());
         final long positionEnd = ensureNearestTimestampPosition(requiredTimestamps.to.getTime());

@@ -1,11 +1,20 @@
 package io.fair_acc.chartfx.samples;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import io.fair_acc.chartfx.XYChart;
+import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
+import io.fair_acc.chartfx.axes.spi.AxisRange;
+import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
 import io.fair_acc.chartfx.axes.spi.format.DefaultTimeFormatter;
+import io.fair_acc.chartfx.plugins.DataPointTooltip;
+import io.fair_acc.chartfx.plugins.EditAxis;
+import io.fair_acc.chartfx.plugins.XValueIndicator;
+import io.fair_acc.chartfx.plugins.Zoomer;
+import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
+import io.fair_acc.chartfx.utils.FXUtils;
+import io.fair_acc.dataset.spi.DefaultDataSet;
+import io.fair_acc.dataset.spi.DoubleDataSet;
+import io.fair_acc.dataset.spi.LimitedIndexedTreeDataSet;
+import io.fair_acc.dataset.utils.ProcessingProfiler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -19,23 +28,17 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import io.fair_acc.chartfx.XYChart;
-import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
-import io.fair_acc.chartfx.axes.spi.AxisRange;
-import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
-import io.fair_acc.chartfx.plugins.DataPointTooltip;
-import io.fair_acc.chartfx.plugins.EditAxis;
-import io.fair_acc.chartfx.plugins.XValueIndicator;
-import io.fair_acc.chartfx.plugins.Zoomer;
-import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
-import io.fair_acc.chartfx.utils.FXUtils;
-import io.fair_acc.dataset.spi.DoubleDataSet;
-import io.fair_acc.dataset.spi.LimitedIndexedTreeDataSet;
-import io.fair_acc.dataset.utils.ProcessingProfiler;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class TimeAxisNonLinearSample extends Application {
+public class TimeAxisNonLinearTimeSample extends Application {
     private static final Timer timer = new Timer();
-
+    LocalDateTime dt = LocalDateTime.now();
     @Override
     public void start(final Stage primaryStage) {
         ProcessingProfiler.setVerboseOutputState(true);
@@ -62,19 +65,28 @@ public class TimeAxisNonLinearSample extends Application {
 
         yAxis1.setAutoRangeRounding(true);
 
-        final var dataSet = new LimitedIndexedTreeDataSet("TestData", 100_000, 60);
+        final var dataSet = new DefaultDataSet("TestData");
+        //set marker to true to see the data points
+        dataSet.setStyle("markerColor=rgb(11,52,43);");
 
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                final double now = System.currentTimeMillis() / 1000.0 + 1; // N.B. '+1'
-                dataSet.add(now - (dataSet.getMaxLength()), Double.NaN, 0., 0.); // first point for long-term history
+        dt = LocalDateTime.now();
 
+        for(int i = 0; i < 6000; i++) {
+            dt = dt.plusMinutes(1);
+            //get the epoch time in milliseconds for dt in Paris
+            final double now = dt.atZone(ZoneId.of("Europe/Paris")).toInstant().toEpochMilli()/1000.0 + 1;
 
-                dataSet.add(now, 100 * Math.cos(2.0 * Math.PI * now), 0., 0.);
-                System.out.println("now: " + now + " " + (100 * Math.cos(2.0 * Math.PI * now)));
+            final var isNight = dt.getHour() >= 18 || dt.getHour() < 8;
+
+            if(!isNight) {
+                dataSet.add(now, 100 * Math.cos(2.0 * Math.PI * dt.getMinute()/60f));
             }
-        }, 1000, 40);
+
+
+        }
+
+
+
 
         long startTime = ProcessingProfiler.getTimeStamp();
         chart.getDatasets().add(dataSet);
@@ -123,22 +135,22 @@ public class TimeAxisNonLinearSample extends Application {
         final var identity = new DoubleDataSet("identity");
         diagChart.getDatasets().addAll(function, inverse, identity);
 
-        final var nSamples = 1000;
-        Runnable updateFunction = () -> {
-            function.clearData();
-            inverse.clearData();
-            identity.clearData();
-            for (var i = 0; i < nSamples; i++) {
-                final double x = (double) i / (nSamples - 1);
-                function.add(x, NonLinearTimeAxis.forwardTransform(x, xAxis1.getThreshold(), xAxis1.getWeight()));
-                inverse.add(x, NonLinearTimeAxis.backwardTransform(x, xAxis1.getThreshold(), xAxis1.getWeight()));
-                identity.add(x, NonLinearTimeAxis.backwardTransform(NonLinearTimeAxis.forwardTransform(x, xAxis1.getThreshold(), xAxis1.getWeight()), xAxis1.getThreshold(), xAxis1.getWeight()));
-            }
-        };
-        updateFunction.run();
-        spThreshold.valueProperty().addListener(evt -> updateFunction.run());
-        spWeight.valueProperty().addListener(evt -> updateFunction.run());
-        root.setBottom(diagChart);
+//        final var nSamples = 1000;
+//        Runnable updateFunction = () -> {
+//            function.clearData();
+//            inverse.clearData();
+//            identity.clearData();
+//            for (var i = 0; i < nSamples; i++) {
+//                final double x = (double) i / (nSamples - 1);
+//                function.add(x, NonLinearTimeAxis.forwardTransform(x, xAxis1.getThreshold(), xAxis1.getWeight()));
+//                inverse.add(x, NonLinearTimeAxis.backwardTransform(x, xAxis1.getThreshold(), xAxis1.getWeight()));
+//                identity.add(x, NonLinearTimeAxis.backwardTransform(NonLinearTimeAxis.forwardTransform(x, xAxis1.getThreshold(), xAxis1.getWeight()), xAxis1.getThreshold(), xAxis1.getWeight()));
+//            }
+//        };
+//        updateFunction.run();
+//        spThreshold.valueProperty().addListener(evt -> updateFunction.run());
+//        spWeight.valueProperty().addListener(evt -> updateFunction.run());
+//        root.setBottom(diagChart);
     }
 
     /**
@@ -164,10 +176,17 @@ public class TimeAxisNonLinearSample extends Application {
 
         @Override
         public double getDisplayPosition(final double value) {
+
+            //get value as epoch seconds as LocalDateTime
+            final var dt = LocalDateTime.ofEpochSecond((long) value, 0, ZoneOffset.UTC);
+            //create boolean variable to check if the date is in between 8pm and 8am
+            final var isNight = dt.getHour() >= 18 || dt.getHour() < 8;
+
+
             final double diffMin = value - getMin();
             final double range = Math.abs(getMax() - getMin());
             final double relPos = diffMin / range;
-            return forwardTransform(relPos, getThreshold(), getWeight()) * getWidth();
+            return forwardTransform(relPos, getThreshold(), getWeight(), isNight) * getWidth();
         }
 
         public double getThreshold() {
@@ -182,7 +201,16 @@ public class TimeAxisNonLinearSample extends Application {
         public double getValueForDisplay(final double displayPosition) {
             final double relPosition = displayPosition / getWidth();
             final double range = Math.abs(getMax() - getMin());
-            return getMin() + backwardTransform(relPosition, getThreshold(), getWeight()) * range;
+
+
+            final double time = getMin() + relPosition * range;
+            //get time as epoch seconds as LocalDateTime
+            final var dt = LocalDateTime.ofEpochSecond((long) time, 0, ZoneOffset.UTC);
+            //create boolean variable to check if the date is in between 8pm and 8am
+            final var isNight = dt.getHour() >= 18 || dt.getHour() < 8;
+
+
+            return getMin() + backwardTransform(relPosition, getThreshold(), getWeight(), isNight) * range;
         }
 
         public double getWeight() {
@@ -247,18 +275,28 @@ public class TimeAxisNonLinearSample extends Application {
             return (getWeight() > getThreshold() ? upperFormat : lowerFormat).toString(boxedValue); // small values
         }
 
-        public static double backwardTransform(final double x, final double threshold, final double weight) {
-            if (x < threshold) {
-                return weight * x / threshold;
-            }
-            return weight + (1.0 - weight) / (1.0 - threshold) * (x - threshold);
+        public static double backwardTransform(final double x, final double threshold, final double weight, final boolean isNight) {
+
+
+
+            return x;
+
+//            if (x < threshold) {
+//                return weight * x / threshold;
+//            }
+//            return weight + (1.0 - weight) / (1.0 - threshold) * (x - threshold);
         }
 
-        public static double forwardTransform(final double x, final double threshold, final double weight) {
-            if (x < weight) {
-                return threshold * x / weight;
-            }
-            return threshold + (1.0 - threshold) / (1.0 - weight) * (x - weight);
+        public static double forwardTransform(final double x, final double threshold, final double weight, final boolean isNight) {
+
+
+
+            return x;
+
+//            if (isNight) {
+//                return threshold * x / weight;
+//            }
+//            return threshold + (1.0 - threshold) / (1.0 - weight) * (x - weight);
         }
     }
 }

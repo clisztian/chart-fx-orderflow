@@ -1,22 +1,5 @@
 package io.fair_acc.financial.samples.service;
 
-import static io.fair_acc.financial.samples.service.SimpleOhlcvReplayDataSet.DataInput.OHLC_TICK;
-
-import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
-import java.util.Calendar;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fair_acc.dataset.event.AddedDataEvent;
 import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import io.fair_acc.dataset.spi.financial.api.attrs.AttributeModelAware;
@@ -29,6 +12,21 @@ import io.fair_acc.financial.samples.service.consolidate.IncrementalOhlcvConsoli
 import io.fair_acc.financial.samples.service.consolidate.OhlcvConsolidationAddon;
 import io.fair_acc.financial.samples.service.consolidate.OhlcvTimeframeConsolidation;
 import io.fair_acc.financial.samples.service.period.IntradayPeriod;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
+import java.util.Calendar;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static io.fair_acc.financial.samples.service.SimpleOhlcvReplayDataSet.DataInput.OHLC_TICK;
 
 /**
  * Very simple financial OHLC replay data set.
@@ -36,16 +34,16 @@ import io.fair_acc.financial.samples.service.period.IntradayPeriod;
  *
  * @author afischer
  */
-public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<IOhlcvItem>, IOhlcvItemAware, AttributeModelAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleOhlcvReplayDataSet.class);
+public class TickOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<IOhlcvItem>, IOhlcvItemAware, AttributeModelAware {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TickOhlcvReplayDataSet.class);
 
     private static final String DATA_SOURCE_OHLC_TICK = "NQ-201609-GLOBEX";
 
-    private static final String DATA_SOURCE_PATH = "chartfx-samples/target/classes/io/fair_acc/chartfx/samples/financial/%s.scid";
+
 
     private final transient DoubleProperty replayMultiply = new SimpleDoubleProperty(this, "replayMultiply", 1.0);
 
-    private DataInput inputSource = OHLC_TICK;
+    private SimpleOhlcvReplayDataSet.DataInput inputSource = OHLC_TICK;
     private String resource;
     protected transient DefaultOHLCV ohlcv;
 
@@ -53,26 +51,28 @@ public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<I
     protected AtomicBoolean paused = new AtomicBoolean(false);
     protected final transient Object pauseSemaphore = new Object();
 
-    protected transient SCIDByNio scid;
+
     protected transient TickDataService tickDataService;
     protected transient TickOhlcvDataProvider tickOhlcvDataProvider;
     protected transient IncrementalOhlcvConsolidation consolidation;
 
     protected transient Set<OhlcvChangeListener> ohlcvChangeListeners = new LinkedHashSet<>();
 
+    private String tickDataFileName;
+
     protected int maxXIndex = 0;
 
-    public enum DataInput {
-        OHLC_TICK
-    }
 
-    public SimpleOhlcvReplayDataSet(DataInput dataInput, IntradayPeriod period, Interval<Calendar> timeRange,
-            Interval<Calendar> tt, Calendar replayFrom, Map<String, OhlcvConsolidationAddon[]> addons) {
+
+    public TickOhlcvReplayDataSet(SimpleOhlcvReplayDataSet.DataInput dataInput, IntradayPeriod period, Interval<Calendar> timeRange,
+                                  Interval<Calendar> tt, Calendar replayFrom, Map<String, OhlcvConsolidationAddon[]> addons,
+                                  String tickDataFileName) {
         super(dataInput.name());
         setInputSource(dataInput);
+        this.tickDataFileName = tickDataFileName;
         fillTestData(period, timeRange, tt, replayFrom, addons); // NOPMD
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.atDebug().addArgument(SimpleOhlcvReplayDataSet.class.getSimpleName()).log("started '{}'");
+            LOGGER.atDebug().addArgument(TickOhlcvReplayDataSet.class.getSimpleName()).log("started '{}'");
         }
     }
 
@@ -84,18 +84,14 @@ public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<I
         lock().writeLockGuard(
                 () -> {
                     try {
-                        if (getInputSource() == OHLC_TICK) {
-                            resource = DATA_SOURCE_OHLC_TICK;
-                        }
-                        // create services
-                        scid = new SCIDByNio();
-                        scid.openNewChannel(String.format(DATA_SOURCE_PATH, resource));
 
-//                        tickDataService = new TickDataService();
-//                        tickDataService.openNewChannel("/home/lisztian/FXProjects/chart-fx/chartfx-samples/src/main/resources/data/CH0012005267_20220209.csv");
 
-                        tickOhlcvDataProvider = scid.createTickDataReplayStream(timeRange, replayFrom.getTime(), replayMultiply);
+                        tickDataService = new TickDataService();
+                        tickDataService.openNewChannel(tickDataFileName);
 
+
+                        tickOhlcvDataProvider = tickDataService.createTickDataReplayStream(timeRange, replayFrom.getTime(), replayMultiply);
+                        System.out.println("Creating TickDataService: " + tickDataService);
                         ohlcv = new DefaultOHLCV();
                         ohlcv.setTitle(resource);
 
@@ -141,11 +137,11 @@ public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<I
         return resource;
     }
 
-    public DataInput getInputSource() {
+    public SimpleOhlcvReplayDataSet.DataInput getInputSource() {
         return inputSource;
     }
 
-    public void setInputSource(DataInput inputSource) {
+    public void setInputSource(SimpleOhlcvReplayDataSet.DataInput inputSource) {
         this.inputSource = inputSource;
     }
 
@@ -178,6 +174,7 @@ public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<I
      * starts play back of the data source via the sound card
      */
     public void start() {
+        System.out.println("Starting.." + running.get() + " " + paused.get() + " " + tickDataService);
         paused.set(false);
         running.set(true);
         new Thread(getDataUpdateTask()).start();
@@ -196,12 +193,8 @@ public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<I
             if (paused.get()) {
                 pauseResume();
             }
-            if (scid != null) {
-                try {
-                    scid.closeActualChannel();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            if (tickDataService != null) {
+                tickDataService.closeActualChannel();
             }
         }
     }
@@ -211,7 +204,7 @@ public class SimpleOhlcvReplayDataSet extends OhlcvDataSet implements Iterable<I
             while (running.get()) {
                 try {
                     tick();
-                    fireInvalidated(new AddedDataEvent(SimpleOhlcvReplayDataSet.this, "tick"));
+                    fireInvalidated(new AddedDataEvent(TickOhlcvReplayDataSet.this, "tick"));
                     // pause simple support
                     while (paused.get()) {
                         synchronized (pauseSemaphore) {

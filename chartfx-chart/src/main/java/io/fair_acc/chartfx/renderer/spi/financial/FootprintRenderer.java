@@ -210,7 +210,7 @@ public class FootprintRenderer extends AbstractFinancialRenderer<FootprintRender
                 Font selectedFontTemplate = footprintAttrs.getRequiredAttribute(BID_ASK_VOLUME_FONTS)[2];
 
                 // financial styling level
-                pocColor = StyleParser.getColorPropertyValue(style, DATASET_FOOTPRINT_POC_COLOR, Color.rgb(255, 255, 0));
+                pocColor = StyleParser.getColorPropertyValue(style, DATASET_FOOTPRINT_POC_COLOR, Color.rgb(25, 255, 208));
                 footprintDefaultFontColor = StyleParser.getColorPropertyValue(style, DATASET_FOOTPRINT_DEFAULT_FONT_COLOR, Color.rgb(255, 255, 255, 0.58));
                 footprintCrossLineColor = StyleParser.getColorPropertyValue(style, DATASET_FOOTPRINT_CROSS_LINE_COLOR, Color.GRAY);
                 footprintBoxLongColor = StyleParser.getColorPropertyValue(style, DATASET_FOOTPRINT_LONG_COLOR, Color.GREEN);

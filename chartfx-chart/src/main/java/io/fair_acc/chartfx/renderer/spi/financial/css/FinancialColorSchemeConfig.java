@@ -22,6 +22,9 @@ import io.fair_acc.chartfx.renderer.spi.financial.service.RendererPaintAfterEP;
 import io.fair_acc.chartfx.renderer.spi.financial.service.RendererPaintAfterEPAware;
 import io.fair_acc.dataset.DataSet;
 import io.fair_acc.dataset.utils.StreamUtils;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 
 public class FinancialColorSchemeConfig implements FinancialColorSchemeAware {
     protected static final String CSS_STYLESHEET = "io/fair_acc/chartfx/financial/%s.css";
@@ -224,8 +227,16 @@ public class FinancialColorSchemeConfig implements FinancialColorSchemeAware {
             break;
 
         case DARK:
+
+            RadialGradient rg = new RadialGradient(0, 0, 0.5, 0.5, 1, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, Color.rgb(5, 12, 15)),
+                    new Stop(1,Color.rgb(2, 2, 12)));
+
             chart.getPlotBackground().setBackground(new Background(
-                    new BackgroundFill(Color.rgb(47, 47, 47), CornerRadii.EMPTY, Insets.EMPTY)));
+                    new BackgroundFill(rg, CornerRadii.EMPTY, Insets.EMPTY)));
+
+//            chart.getPlotBackground().setBackground(new Background(
+//                    new BackgroundFill(Color.rgb(47, 47, 47), CornerRadii.EMPTY, Insets.EMPTY)));
             chart.getGridRenderer().getVerticalMinorGrid().setVisible(false);
             chart.getGridRenderer().getVerticalMajorGrid().setVisible(false);
             chart.getGridRenderer().getHorizontalMajorGrid().setVisible(true);

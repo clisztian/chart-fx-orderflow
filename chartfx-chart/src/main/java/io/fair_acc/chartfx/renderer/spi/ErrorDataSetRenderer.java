@@ -13,6 +13,8 @@ import javafx.scene.shape.FillRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import io.fair_acc.chartfx.renderer.spi.utils.TradeSizeShadow;
 import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.XYChartCss;
@@ -314,11 +316,13 @@ public class ErrorDataSetRenderer extends AbstractErrorDataSetRendererParameter<
 
                 if (localCachedPoints.styles[i] == null) {
                     gc.fillRect(localCachedPoints.xValues[i] - barWidthHalf, yMin, localBarWidth, yDiff);
+                    gc.setEffect(TradeSizeShadow.drop);
 
                 } else {
                     gc.save();
                     gc.setFill(StyleParser.getColorPropertyValue(localCachedPoints.styles[i], XYChartCss.FILL_COLOR));
                     gc.fillRect(localCachedPoints.xValues[i] - barWidthHalf, yMin, localBarWidth, yDiff);
+                    gc.setEffect(TradeSizeShadow.drop);
                     gc.restore();
                 }
             }
@@ -344,6 +348,7 @@ public class ErrorDataSetRenderer extends AbstractErrorDataSetRendererParameter<
                 XYChartCss.STROKE_COLOR);
         if (fillColor != null) {
             gc.setFill(fillColor);
+            gc.setEffect(TradeSizeShadow.drop);
         }
 
         final double minSize = getMarkerSize();
@@ -589,6 +594,7 @@ public class ErrorDataSetRenderer extends AbstractErrorDataSetRendererParameter<
         if (defaultMarkerColor != null) {
             gc.setFill(defaultMarkerColor);
             gc.setStroke(defaultMarkerColor);
+            gc.setEffect(TradeSizeShadow.drop);
         }
         for (int i = 0; i < localCachedPoints.actualDataCount; i++) {
             final double x = localCachedPoints.xValues[i];
@@ -601,6 +607,7 @@ public class ErrorDataSetRenderer extends AbstractErrorDataSetRendererParameter<
                 gc.save();
                 if (markerForPoint.getSecond() != null) {
                     gc.setFill(markerForPoint.getSecond());
+                    gc.setEffect(TradeSizeShadow.drop);
                 }
                 final Marker pointMarker = markerForPoint.getFirst() == null ? defaultMarker
                                                                              : markerForPoint.getFirst();

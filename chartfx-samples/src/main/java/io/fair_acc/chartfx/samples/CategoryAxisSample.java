@@ -1,11 +1,13 @@
 package io.fair_acc.chartfx.samples;
 
 import java.text.DateFormatSymbols;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
+import io.fair_acc.chartfx.plugins.DataPointTooltip;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -23,20 +25,24 @@ import io.fair_acc.chartfx.renderer.LineStyle;
 import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
 import io.fair_acc.dataset.spi.DefaultErrorDataSet;
 import io.fair_acc.dataset.testdata.spi.RandomDataGenerator;
+import javafx.util.StringConverter;
 
 /**
  * @author rstein
  */
 public class CategoryAxisSample extends Application {
-    private static final int N_SAMPLES = 30;
+    private static final int N_SAMPLES = 400000;
 
     @Override
     public void start(final Stage primaryStage) {
+
+        Random rng = new Random(23);
+
         final StackPane root = new StackPane();
         final CategoryAxis xAxis = new CategoryAxis("months");
         // xAxis.setTickLabelRotation(90);
         // alt:
-        xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SHIFT_ALT);
+        xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis.setMaxMajorTickLabelCount(N_SAMPLES + 1);
         final DefaultNumericAxis yAxis = new DefaultNumericAxis("yAxis");
 
@@ -54,11 +60,16 @@ public class CategoryAxisSample extends Application {
         lineChartPlot.getPlugins().add(new ParameterMeasurements());
         lineChartPlot.getPlugins().add(new EditAxis());
         final Zoomer zoomer = new Zoomer();
+        final DataPointTooltip tooltip = new DataPointTooltip();
+
         // zoomer.setSliderVisible(false);
         // zoomer.setAddButtonsToToolBar(false);
         lineChartPlot.getPlugins().add(zoomer);
+        lineChartPlot.getPlugins().add(tooltip);
 
         final DefaultErrorDataSet dataSet = new DefaultErrorDataSet("myData");
+        final DefaultErrorDataSet dataSet2 = new DefaultErrorDataSet("myData2");
+
         final Scene scene = new Scene(root, 800, 600);
 
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
@@ -76,8 +87,16 @@ public class CategoryAxisSample extends Application {
             y += RandomDataGenerator.random() - 0.5;
             final double ex = 0.0;
             final double ey = 0.1;
-            dataSet.add(n, y, ex, ey);
-            dataSet.addDataLabel(n, "SpecialCategory#" + n);
+
+            if(rng.nextFloat() < .3) {
+                dataSet.add(n, y, ex, ey);
+                dataSet.addDataLabel(n, "my second data point at " + n + "\n now I need to put \n a bunch of stuff here \n to see if it's all rendered" + n);
+            }
+            else {
+                dataSet2.add(n, y, ex, ey);
+                dataSet2.addDataLabel(n, "my data point at " + n + "\n now I need to put \n a bunch of stuff here \n to see if it's all rendered" + n);
+            }
+
         }
 
         // setting the axis categories to null forces the first data set's
@@ -85,8 +104,11 @@ public class CategoryAxisSample extends Application {
         // enable this if you want to use the data set's categories
         // xAxis.setCategories(null);
 
-        lineChartPlot.getDatasets().add(dataSet);
+        lineChartPlot.getDatasets().addAll(dataSet, dataSet2);
         root.getChildren().add(lineChartPlot);
+
+
+
 
         primaryStage.setTitle(this.getClass().getSimpleName());
         primaryStage.setScene(scene);
